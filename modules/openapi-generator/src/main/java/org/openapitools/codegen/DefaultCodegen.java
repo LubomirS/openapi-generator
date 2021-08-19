@@ -41,6 +41,7 @@ import org.openapitools.codegen.meta.features.*;
 import org.openapitools.codegen.serializer.SerializerUtils;
 import org.openapitools.codegen.templating.MustacheEngineAdapter;
 import org.openapitools.codegen.templating.mustache.*;
+import org.openapitools.codegen.utils.DecimalType;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.OneOfImplementorAdditionalData;
 import org.slf4j.Logger;
@@ -656,10 +657,22 @@ public class DefaultCodegen implements CodegenConfig {
                 cm.allowableValues.put("enumVars", enumVars);
             }
 
+            if (cm.interfaces != null && cm.interfaces.contains("Entity")) {
+            	cm.vendorExtensions.put("x-entity-filter", true);
+			}
+
             // update codegen property enum with proper naming convention
             // and handling of numbers, special characters
             for (CodegenProperty var : cm.vars) {
                 updateCodegenPropertyEnum(var);
+				if (StringUtils.equalsIgnoreCase(var.getDataFormat(), DecimalType.CURRENCY.name().toLowerCase(Locale.ENGLISH))) {
+					var.getVendorExtensions().put("x-decimal-format", DecimalType.CURRENCY.getValue());
+				} else if (StringUtils.equalsIgnoreCase(var.getDataFormat(), DecimalType.PERCENTAGE.name().toLowerCase(Locale.ENGLISH))) {
+					var.getVendorExtensions().put("x-decimal-format", DecimalType.PERCENTAGE.getValue());
+				}
+				if (StringUtils.equalsIgnoreCase(var.getBaseName(), "_expands")) {
+					var.getVendorExtensions().put("x-expands-list", true);
+				}
             }
 
             for (CodegenProperty var : cm.allVars) {

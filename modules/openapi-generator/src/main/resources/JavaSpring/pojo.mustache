@@ -1,6 +1,9 @@
 /**
  * {{#description}}{{.}}{{/description}}{{^description}}{{classname}}{{/description}}
  */{{#description}}
+{{#vendorExtensions.x-entity-filter}}
+@com.fasterxml.jackson.annotation.JsonFilter(nl.davinci.close.domain.model.common.JsonConfiguration.ENTITY_FILTER)
+{{/vendorExtensions.x-entity-filter}}
 @ApiModel(description = "{{{description}}}"){{/description}}
 {{>generatedAnnotation}}{{#discriminator}}{{>typeInfoAnnotation}}{{/discriminator}}{{>xmlAnnotation}}{{>additionalModelTypeAnnotations}}
 public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}}{{^parent}}{{#hateoas}}extends RepresentationModel<{{classname}}> {{/hateoas}}{{/parent}} {{#serializableModel}}implements Serializable{{/serializableModel}} {
@@ -23,6 +26,22 @@ public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}}{{^parent}}
   @JsonProperty("{{baseName}}"){{#withXml}}
   @JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}"){{/withXml}}
   {{/jackson}}
+  {{#vendorExtensions.x-element-ref}}
+  @nl.davinci.rest.elementref.annotations.ElementRef("{{vendorExtensions.x-element-ref}}")
+  {{/vendorExtensions.x-element-ref}}
+  {{#vendorExtensions.x-expandable}}
+  @nl.davinci.close.domain.model.common.expand.Expandable(name = "{{name}}", paths = {
+  {{#expansion}}@nl.davinci.close.domain.model.common.expand.ExpandPath({{#productFamilyType}}product = ProductFamilyType.{{productFamilyType}},{{/productFamilyType}}{{#loanLifeCycle}}loanLifecycle = LoanLifeCycleType.{{loanLifeCycle}}{{/loanLifeCycle}}){{^last}}, {{/last}}
+  {{/expansion}}
+  })
+  {{/vendorExtensions.x-expandable}}
+  {{#vendorExtensions.x-entity-id}}
+  @nl.davinci.rest.elementref.annotations.ElementId
+  {{/vendorExtensions.x-entity-id}}
+  {{#vendorExtensions.x-decimal-format}}
+  @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = nl.davinci.close.domain.model.common.serialization.{{vendorExtensions.x-decimal-format}}Serializer.class)
+  @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = nl.davinci.close.domain.model.common.serialization.{{vendorExtensions.x-decimal-format}}Deserializer.class)
+  {{/vendorExtensions.x-decimal-format}}
   {{#gson}}
   @SerializedName("{{baseName}}")
   {{/gson}}
@@ -36,12 +55,6 @@ public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}}{{^parent}}
   {{/openApiNullable}}
   {{/isContainer}}
   {{^isContainer}}
-  {{#isDate}}
-  @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
-  {{/isDate}}
-  {{#isDateTime}}
-  @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
-  {{/isDateTime}}
   {{#openApiNullable}}
   private {{>nullableDataType}} {{name}}{{#isNullable}} = JsonNullable.undefined(){{/isNullable}}{{^isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/isNullable}};
   {{/openApiNullable}}
@@ -114,7 +127,12 @@ public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}}{{^parent}}
   {{/vendorExtensions.x-extra-annotation}}
   @ApiModelProperty({{#example}}example = "{{{example}}}", {{/example}}{{#required}}required = {{required}}, {{/required}}{{#isReadOnly}}readOnly = {{{isReadOnly}}}, {{/isReadOnly}}value = "{{{description}}}")
 {{#useBeanValidation}}{{>beanValidation}}{{/useBeanValidation}}  public {{>nullableDataType}} {{getter}}() {
-    return {{name}};
+  {{#vendorExtensions.x-expands-list}}
+	  return nl.davinci.close.domain.model.common.expand.ExpandManager.getExpansionNames(this.getClass());
+  {{/vendorExtensions.x-expands-list}}
+  {{^vendorExtensions.x-expands-list}}
+	  return {{name}};
+  {{/vendorExtensions.x-expands-list}}
   }
 
   public void {{setter}}({{>nullableDataType}} {{name}}) {
