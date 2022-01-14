@@ -135,6 +135,7 @@ public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}{{#ha
   {{/vendorExtensions.x-expands-list}}
   }
 
+  {{#vendorExtensions.x-codetable}}@nl.davinci.close.domain.model.common.codetable.CodeTable("{{{vendorExtensions.x-codetable}}}"){{/vendorExtensions.x-codetable}}
   public void {{setter}}({{>nullableDataType}} {{name}}) {
     this.{{name}} = {{name}};
   }
